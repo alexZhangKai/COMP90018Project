@@ -30,7 +30,6 @@ router.post("/addFace", upload.single("photo"), function(req, res){
   var buffer = new Buffer(req.file.buffer);
   uploadFile(buffer, res);
   addFace(req.query.personID, res);
-  trainPersonGroup();
 });
 
 router.post("/identify", upload.single("photo"), function(req, res){
@@ -38,6 +37,10 @@ router.post("/identify", upload.single("photo"), function(req, res){
   uploadFile(buffer, res);
   var faceid = detectFace(res);
   //identify(faceid, res);
+});
+
+router.get("/trainGroup", function(req, res){
+  trainPersonGroup(res);
 });
 
 module.exports = router;
@@ -112,7 +115,7 @@ function deletePerson(personID, client){
 
   request(options, function(error, response, body){
     if(error) console.log(error);
-    client.send(body);
+    client.send('{result: success}');
   });
 }
 
@@ -120,7 +123,7 @@ function uploadFile(buffer, client){
   var stream = bufferToStream(buffer);
   blobService.createBlockBlobFromStream("faceimgs", "testBlob", stream, buffer.length, function(error){
     if(error){
-      client.send(error);
+      client.write(error);
     };
   });
 }
@@ -142,7 +145,7 @@ function addFace(personID, client){
   });
 }
 
-function trainPersonGroup(){
+function trainPersonGroup(client){
   var options = {
     method: "POST",
     url: "https://southeastasia.api.cognitive.microsoft.com/face/v1.0/persongroups/facedb/train",
@@ -154,6 +157,7 @@ function trainPersonGroup(){
 
   request(options, function(error, response, body){
     if(error) console.log(error);
+    client.send('{result: success}');
   });
 }
 

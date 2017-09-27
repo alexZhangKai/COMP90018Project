@@ -1,11 +1,57 @@
 <h3>Welcome to FaceDB Management System</h3>
 <p>This is a server connecting Azure cognitive services and front end application.</p>
 <hr>
-<h4>Create Face Group</h4>
 <div>
+  <h4>Create Face Group</h4>
   <label for="groupName">Face Group Name</label>
-  <input type="text" id="groupName" placeholder="Face Group Name"><br>
+  <input type="text" id="groupName" placeholder="DefaultGroupName"><br>
+  <textarea id="CgroupResult" rows="8" cols="80">Returned result will be here.</textarea><br>
   <input type="button" id="createFaceGroup" value="Create">
 </div>
-
+<hr>
+<div>
+  <h4>Add a Person</h4>
+  <label for="personName">Person Name</label>
+  <input type="text" id="personName" placeholder="DefaultPersonName"><br>
+  <textarea id="CpersonResult" rows="8" cols="80">Returned result will be here.</textarea><br>
+  <input type="button" id="createPerson" value="Create">
+</div>
+<hr>
+<div>
+  <h4>Delete a Person</h4>
+  <label for="personID">PersonID</label>
+  <input type="text" id="personID" placeholder="Give a PersonID"><br>
+  <textarea id="DpersonResult" rows="8" cols="80">Returned result will be here.</textarea><br>
+  <input type="button" id="deletePerson" value="Delete">
+</div>
+<hr>
+<div>
+  <h4>List All Persons</h4>
+  <textarea id="ListResult" rows="8" cols="80">Returned result will be here.</textarea><br>
+  <input type="button" id="listAllPerson" value="List">
+</div>
+<hr>
+<div>
+  <h4>Add A Face to A Person</h4>
+  <label for="personIDForFace">PersonID</label>
+  <input type="text" id="personIDForFace" placeholder="Give a PersonID"><br>
+  <label for="personFace">Person Face</label>
+  <input type="file" id="personFace"><br>
+  <textarea id="AFaceResult" rows="8" cols="80">Returned result will be here.</textarea><br>
+  <input type="button" id="addFace" value="Add">
+</div>
+<hr>
+<div>
+  <h4>Identify A Face</h4>
+  <label for="personFace">Person Face</label>
+  <input type="file" id="candidate"><br>
+  <textarea id="identifyResult" rows="8" cols="80">Returned result will be here.</textarea><br>
+  <input type="button" id="identify" value="Identify">
+</div>
+<hr>
+<div>
+  <h4>Train Group</h4>
+  <textarea id="trainResult" rows="8" cols="80">Returned result will be here.</textarea><br>
+  <input type="button" id="trainGroup" value="Train">
+</div>
 <script type="text/javascript" src="./javascripts/index.js"></script>
