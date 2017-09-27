@@ -19,7 +19,7 @@
 <hr>
 <div>
   <h4>Delete a Person</h4>
-  <label for="personID">Person Name</label>
+  <label for="personID">PersonID</label>
   <input type="text" id="personID" placeholder="Give a PersonID"><br>
   <textarea id="DpersonResult" rows="8" cols="80">Returned result will be here.</textarea><br>
   <input type="button" id="deletePerson" value="Delete">
@@ -31,5 +31,27 @@
   <input type="button" id="listAllPerson" value="List">
 </div>
 <hr>
-
+<div>
+  <h4>Add A Face to A Person</h4>
+  <label for="personIDForFace">PersonID</label>
+  <input type="text" id="personIDForFace" placeholder="Give a PersonID"><br>
+  <label for="personFace">Person Face</label>
+  <input type="file" id="personFace"><br>
+  <textarea id="AFaceResult" rows="8" cols="80">Returned result will be here.</textarea><br>
+  <input type="button" id="addFace" value="Add">
+</div>
+<hr>
+<div>
+  <h4>Identify A Face</h4>
+  <label for="personFace">Person Face</label>
+  <input type="file" id="candidate"><br>
+  <textarea id="identifyResult" rows="8" cols="80">Returned result will be here.</textarea><br>
+  <input type="button" id="identify" value="Identify">
+</div>
+<hr>
+<div>
+  <h4>Train Group</h4>
+  <textarea id="trainResult" rows="8" cols="80">Returned result will be here.</textarea><br>
+  <input type="button" id="trainGroup" value="Train">
+</div>
 <script type="text/javascript" src="./javascripts/index.js"></script>

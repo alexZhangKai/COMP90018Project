@@ -59,7 +59,7 @@ $(function(){
         dataType: 'jsonp',
         success: function(data){
           console.log(data);
-          $('#DpersonResult').val(data.responseText);
+          $('#DpersonResult').val('success');
         },
         error: function(err){
           console.log(err.responseText);
@@ -86,4 +86,72 @@ $(function(){
       }
     });
   });
+
+  var faceFile;
+  $('#personFace').on('change', function(){
+    faceFile = this.files[0];
+  });
+
+  $('#addFace').on('click', function(){
+    var fd = new FormData();
+    fd.append('photo', faceFile);
+
+    var personID = $('#personIDForFace').val();
+    var params = {
+      personID: personID
+    };
+    var url = '/api/addFace?' + $.param(params);
+    var xhr = new XMLHttpRequest();
+
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === 4) {
+        $('#AFaceResult').val(xhr.response);
+        console.log(xhr.response);
+      }
+    }
+    xhr.open('POST', url, true);
+    xhr.send(fd);
+  });
+
+  var candidateFile;
+  $('#candidate').on('change', function(){
+    candidateFile = this.files[0];
+  });
+
+  $('#identify').on('click', function(){
+    var fd = new FormData();
+    fd.append('photo', candidateFile);
+
+    var url = '/api/identify';
+    var xhr = new XMLHttpRequest();
+
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === 4) {
+        $('#identifyResult').val(xhr.response);
+        console.log(xhr.response);
+      }
+    }
+    xhr.open('POST', url, true);
+    xhr.send(fd);
+  });
+
+  $('#trainGroup').on('click', function(){
+    // var url = window.location.hostname + '/api/createFaceGroup?' + $.param(params);
+    var url = '/api/trainGroup';
+    console.log(url);
+    $.ajax({
+      type: 'GET',
+      url: url,
+      dataType: 'jsonp',
+      success: function(data){
+        console.log(data);
+        $('#trainResult').val(data.responseText);
+      },
+      error: function(err){
+        console.log(err.responseText);
+        $('#trainResult').val(err.responseText);
+      }
+    });
+  });
+
 });
