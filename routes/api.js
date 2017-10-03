@@ -1,46 +1,54 @@
-var request = require("request");
-var express = require("express");
-var azure = require("azure-storage");
-var blobService = azure.createBlobService("faceimg", "vjckPyJ37aWuElE81It17cMOZvy54+1pAXYEQWzmRyCqlqpYEOpST6ZZ1LO1dgtwtjs5P7wV3Bwih3B5q9vUrg==");
-var multer = require("multer");
+var request = require('request');
+var express = require('express');
+var azure = require('azure-storage');
+var blobService = azure.createBlobService('faceimg', 'vjckPyJ37aWuElE81It17cMOZvy54+1pAXYEQWzmRyCqlqpYEOpST6ZZ1LO1dgtwtjs5P7wV3Bwih3B5q9vUrg==');
+var multer = require('multer');
 var storage = multer.memoryStorage();
 var upload = multer({storage: storage});
+var mongoClient = require('mongodb').MongoClient;
 
-const subKey = "3557f36bcd7d45edb927993db27a47fb";
-const fileUrl = "https://faceimg.blob.core.windows.net/faceimgs/testBlob";
+const subKey = '3557f36bcd7d45edb927993db27a47fb';
+const fileUrl = 'https://faceimg.blob.core.windows.net/faceimgs/testBlob';
+const mongodbUrl = 'mongodb://crimeinfomobile:kaaGy7qBriWfQCLBvp1N3D8nRmL7MB3lKYBfKrwBNjbUVVVEsmL3a6UcAa07IWZOa3n2wv8GO23f2Lb4Y4Rv0w==@crimeinfomobile.documents.azure.com:10255/?ssl=true'
+
 var router = express.Router();
 
-router.get("/createFaceGroup", function(req, res){
+router.get('/createFaceGroup', function(req, res){
   createFaceGroup(req.query.groupName, res);
 });
 
-router.get("/createPerson", function(req, res){
+router.get('/createPerson', function(req, res){
   createPerson(req.query.personName, res);
 });
 
-router.get("/listAllPerson", function(req, res){
+router.get('/listAllPerson', function(req, res){
   listAllPerson(res);
 });
 
-router.get("/deletePerson", function(req, res){
+router.get('/deletePerson', function(req, res){
   deletePerson(req.query.personID, res);
 });
 
-router.post("/addFace", upload.single("photo"), function(req, res){
+router.post('/addFace', upload.single('photo'), function(req, res){
   var buffer = new Buffer(req.file.buffer);
   uploadFile(buffer, res);
   addFace(req.query.personID, res);
 });
 
-router.post("/identify", upload.single("photo"), function(req, res){
+router.post('/identify', upload.single('photo'), function(req, res){
   var buffer = new Buffer(req.file.buffer);
   uploadFile(buffer, res);
   var faceid = detectFace(res);
   //identify(faceid, res);
 });
 
-router.get("/trainGroup", function(req, res){
+router.get('/trainGroup', function(req, res){
   trainPersonGroup(res);
+});
+
+router.get('/crimeInfo', function(req, res){
+  var postcode = req.query.postcode;
+
 });
 
 module.exports = router;
@@ -55,11 +63,11 @@ function bufferToStream(buffer) {
 
 function createFaceGroup(groupName, client){
   var options = {
-    method: "PUT",
-    url: "https://southeastasia.api.cognitive.microsoft.com/face/v1.0/persongroups/facedb",
+    method: 'PUT',
+    url: 'https://southeastasia.api.cognitive.microsoft.com/face/v1.0/persongroups/facedb',
     headers:
-     {"content-type": "application/json",
-      "ocp-apim-subscription-key": subKey},
+     {'content-type': 'application/json',
+      'ocp-apim-subscription-key': subKey},
     body: {name: groupName},
     json: true
   };
@@ -72,11 +80,11 @@ function createFaceGroup(groupName, client){
 
 function createPerson(personName, client){
   var options = {
-    method: "POST",
-    url: "https://southeastasia.api.cognitive.microsoft.com/face/v1.0/persongroups/facedb/persons",
+    method: 'POST',
+    url: 'https://southeastasia.api.cognitive.microsoft.com/face/v1.0/persongroups/facedb/persons',
     headers:
-     {"content-type": "application/json",
-      "ocp-apim-subscription-key": subKey},
+     {'content-type': 'application/json',
+      'ocp-apim-subscription-key': subKey},
     body: {name: personName},
     json: true
   };
@@ -89,11 +97,11 @@ function createPerson(personName, client){
 
 function listAllPerson(client){
   var options = {
-    method: "GET",
-    url: "https://southeastasia.api.cognitive.microsoft.com/face/v1.0/persongroups/facedb/persons",
+    method: 'GET',
+    url: 'https://southeastasia.api.cognitive.microsoft.com/face/v1.0/persongroups/facedb/persons',
     headers:
-     {"content-type": "application/json",
-      "ocp-apim-subscription-key": subKey},
+     {'content-type': 'application/json',
+      'ocp-apim-subscription-key': subKey},
     json: true
   };
 
@@ -105,11 +113,11 @@ function listAllPerson(client){
 
 function deletePerson(personID, client){
   var options = {
-    method: "DELETE",
-    url: "https://southeastasia.api.cognitive.microsoft.com/face/v1.0/persongroups/facedb/persons/"+personID,
+    method: 'DELETE',
+    url: 'https://southeastasia.api.cognitive.microsoft.com/face/v1.0/persongroups/facedb/persons/'+personID,
     headers:
-     {"content-type": "application/json",
-      "ocp-apim-subscription-key": subKey},
+     {'content-type': 'application/json',
+      'ocp-apim-subscription-key': subKey},
     json: true
   };
 
@@ -121,7 +129,7 @@ function deletePerson(personID, client){
 
 function uploadFile(buffer, client){
   var stream = bufferToStream(buffer);
-  blobService.createBlockBlobFromStream("faceimgs", "testBlob", stream, buffer.length, function(error){
+  blobService.createBlockBlobFromStream('faceimgs', 'testBlob', stream, buffer.length, function(error){
     if(error){
       client.write(error);
     };
@@ -130,11 +138,11 @@ function uploadFile(buffer, client){
 
 function addFace(personID, client){
   var options = {
-    method: "POST",
-    url: "https://southeastasia.api.cognitive.microsoft.com/face/v1.0/persongroups/facedb/persons/"+personID+"/persistedFaces",
+    method: 'POST',
+    url: 'https://southeastasia.api.cognitive.microsoft.com/face/v1.0/persongroups/facedb/persons/'+personID+'/persistedFaces',
     headers:
-     {"content-type": "application/json",
-      "ocp-apim-subscription-key": subKey},
+     {'content-type': 'application/json',
+      'ocp-apim-subscription-key': subKey},
     body: {url: fileUrl},
     json: true
   };
@@ -147,11 +155,11 @@ function addFace(personID, client){
 
 function trainPersonGroup(client){
   var options = {
-    method: "POST",
-    url: "https://southeastasia.api.cognitive.microsoft.com/face/v1.0/persongroups/facedb/train",
+    method: 'POST',
+    url: 'https://southeastasia.api.cognitive.microsoft.com/face/v1.0/persongroups/facedb/train',
     headers:
-     {"content-type": "application/json",
-      "ocp-apim-subscription-key": subKey},
+     {'content-type': 'application/json',
+      'ocp-apim-subscription-key': subKey},
     json: true
   };
 
@@ -163,11 +171,11 @@ function trainPersonGroup(client){
 
 function detectFace(client){
   var options = {
-    method: "POST",
-    url: "https://southeastasia.api.cognitive.microsoft.com/face/v1.0/detect",
+    method: 'POST',
+    url: 'https://southeastasia.api.cognitive.microsoft.com/face/v1.0/detect',
     headers:
-     {"content-type": "application/json",
-      "ocp-apim-subscription-key": subKey},
+     {'content-type': 'application/json',
+      'ocp-apim-subscription-key': subKey},
     body: {url: fileUrl},
     json: true
   };
@@ -182,13 +190,13 @@ function identify(faceid, client){
   var lst = [];
   lst.push(faceid);
   var options = {
-    method: "POST",
-    url: "https://southeastasia.api.cognitive.microsoft.com/face/v1.0/identify",
+    method: 'POST',
+    url: 'https://southeastasia.api.cognitive.microsoft.com/face/v1.0/identify',
     headers:
-     {"content-type": "application/json",
-      "ocp-apim-subscription-key": subKey},
+     {'content-type': 'application/json',
+      'ocp-apim-subscription-key': subKey},
     body: {
-      personGroupId: "facedb",
+      personGroupId: 'facedb',
       faceIds: lst,
       maxNumOfCandidatesReturned: 1,
       confidenceThreshold: 0.5
@@ -199,5 +207,13 @@ function identify(faceid, client){
   request(options, function(error, response, body){
     if(error) console.log(error);
     client.send(body);
+  });
+}
+
+function getCrimeInfo(postcode, client){
+  // connect to mongodb
+  mongoClient.connect('mongodb://crimeinfo2017:iGeobQWXAxnMeMON8XeCet2Rs9OyGFWsdqVUF041ZrgEmJlZeHxhf026sP5t3DmpQhYunzidf42diPeoiCS6BA==@crimeinfo2017.documents.azure.com:10255/?ssl=true', function (err, db) {
+
+    db.close();
   });
 }
