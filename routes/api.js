@@ -9,7 +9,7 @@ var mongoClient = require('mongodb').MongoClient;
 
 const subKey = '3557f36bcd7d45edb927993db27a47fb';
 const fileUrl = 'https://faceimg.blob.core.windows.net/faceimgs/testBlob';
-const mongodbUrl = 'mongodb://crimeinfomobile:kaaGy7qBriWfQCLBvp1N3D8nRmL7MB3lKYBfKrwBNjbUVVVEsmL3a6UcAa07IWZOa3n2wv8GO23f2Lb4Y4Rv0w==@crimeinfomobile.documents.azure.com:10255/?ssl=true'
+const mongodbUrl = 'mongodb://crimeinfomobile:kaaGy7qBriWfQCLBvp1N3D8nRmL7MB3lKYBfKrwBNjbUVVVEsmL3a6UcAa07IWZOa3n2wv8GO23f2Lb4Y4Rv0w==@crimeinfomobile.documents.azure.com:10255/?ssl=true&replicaSet=globaldb'
 
 var router = express.Router();
 
@@ -48,7 +48,7 @@ router.get('/trainGroup', function(req, res){
 
 router.get('/crimeInfo', function(req, res){
   var postcode = req.query.postcode;
-
+  getCrimeInfo(postcode, res);
 });
 
 module.exports = router;
@@ -212,8 +212,17 @@ function identify(faceid, client){
 
 function getCrimeInfo(postcode, client){
   // connect to mongodb
-  mongoClient.connect('mongodb://crimeinfo2017:iGeobQWXAxnMeMON8XeCet2Rs9OyGFWsdqVUF041ZrgEmJlZeHxhf026sP5t3DmpQhYunzidf42diPeoiCS6BA==@crimeinfo2017.documents.azure.com:10255/?ssl=true', function (err, db) {
-
-    db.close();
+  mongoClient.connect(mongodbUrl, function (err, database) {
+    if(err) console.log(err);
+    var db = database.db('crimeInfo');
+    console.log(db.databaseName);
+    var collection = db.collection('testonly2info');
+    collection.find({
+      Postcode:postcode
+    }).toArray(function(err, docs){
+      if(err) console.log(err);
+      client.send(docs);
+      db.close();
+    });
   });
 }
