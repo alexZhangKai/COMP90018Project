@@ -42,6 +42,12 @@
 </div>
 <hr>
 <div>
+  <h4>Train Group</h4>
+  <textarea id="trainResult" rows="8" cols="80">Returned result will be here.</textarea><br>
+  <input type="button" id="trainGroup" value="Train">
+</div>
+<hr>
+<div>
   <h4>Identify A Face</h4>
   <label for="personFace">Person Face</label>
   <input type="file" id="candidate"><br>
@@ -50,8 +56,10 @@
 </div>
 <hr>
 <div>
-  <h4>Train Group</h4>
-  <textarea id="trainResult" rows="8" cols="80">Returned result will be here.</textarea><br>
-  <input type="button" id="trainGroup" value="Train">
+  <h4>Search Crime Information</h4>
+  <label for="postcode">Postcode</label>
+  <input type="text" id="postcode" placeholder="Enter a Postcode"><br>
+  <textarea id="crimeInfoResult" rows="8" cols="80">Returned result will be here.</textarea><br>
+  <input type="button" id="searchCrimeInfo" value="Search">
 </div>
 <script type="text/javascript" src="./javascripts/index.js"></script>
