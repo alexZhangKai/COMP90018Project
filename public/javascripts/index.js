@@ -154,4 +154,26 @@ $(function(){
     });
   });
 
+  $('#searchCrimeInfo').on('click', function(){
+    var postcode = $('#postcode').val();
+    var params = {
+      postcode: postcode
+    };
+    var url = '/api/crimeInfo?' + $.param(params);
+    console.log(url);
+    $.ajax({
+      type: 'GET',
+      url: url,
+      dataType: 'jsonp',
+      success: function(data){
+        console.log(data);
+        $('#crimeInfoResult').val(data.responseText);
+      },
+      error: function(err){
+        console.log(err.responseText);
+        $('#crimeInfoResult').val(err.responseText);
+      }
+    });
+  });
+
 });

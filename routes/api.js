@@ -216,7 +216,7 @@ function getCrimeInfo(postcode, client){
     if(err) console.log(err);
     var db = database.db('crimeInfo');
     console.log(db.databaseName);
-    var collection = db.collection('testonly2info');
+    var collection = db.collection('only2017info');
     collection.find({
       Postcode:postcode
     }).toArray(function(err, docs){
