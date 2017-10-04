@@ -8,7 +8,7 @@ var upload = multer({storage: storage});
 var mongoClient = require('mongodb').MongoClient;
 
 const subKey = '3557f36bcd7d45edb927993db27a47fb';
-const fileUrl = 'https://faceimg.blob.core.windows.net/faceimgs/testBlob';
+const fileUrl = 'https://faceimg.blob.core.windows.net/faceimgs/userUploadPhoto';
 const mongodbUrl = 'mongodb://crimeinfomobile:kaaGy7qBriWfQCLBvp1N3D8nRmL7MB3lKYBfKrwBNjbUVVVEsmL3a6UcAa07IWZOa3n2wv8GO23f2Lb4Y4Rv0w==@crimeinfomobile.documents.azure.com:10255/?ssl=true&replicaSet=globaldb'
 
 var router = express.Router();
@@ -49,6 +49,10 @@ router.get('/trainGroup', function(req, res){
 router.get('/crimeInfo', function(req, res){
   var postcode = req.query.postcode;
   getCrimeInfo(postcode, res);
+});
+
+router.get('/identify', function(req, res){
+  var faceid = detectFace(res);
 });
 
 module.exports = router;
