@@ -8,7 +8,7 @@ var upload = multer({storage: storage});
 var mongoClient = require('mongodb').MongoClient;
 
 const subKey = '3557f36bcd7d45edb927993db27a47fb';
-const fileUrl = 'https://faceimg.blob.core.windows.net/faceimgs/userUploadPhoto';
+const fileUrl = 'https://faceimg.blob.core.windows.net/faceimgs/';
 const mongodbUrl = 'mongodb://crimeinfomobile:kaaGy7qBriWfQCLBvp1N3D8nRmL7MB3lKYBfKrwBNjbUVVVEsmL3a6UcAa07IWZOa3n2wv8GO23f2Lb4Y4Rv0w==@crimeinfomobile.documents.azure.com:10255/?ssl=true&replicaSet=globaldb'
 
 var router = express.Router();
@@ -31,15 +31,15 @@ router.get('/deletePerson', function(req, res){
 
 router.post('/addFace', upload.single('photo'), function(req, res){
   var buffer = new Buffer(req.file.buffer);
-  uploadFile(buffer, res);
-  addFace(req.query.personID, res);
+  var personID = req.query.personID;
+  uploadFileForAddFace(personID, buffer, res);
+  // addFace(personID, res);
 });
 
 router.post('/identify', upload.single('photo'), function(req, res){
   var buffer = new Buffer(req.file.buffer);
-  uploadFile(buffer, res);
+  uploadFileForIdentify(buffer, res);
   var faceid = detectFace(res);
-  //identify(faceid, res);
 });
 
 router.get('/trainGroup', function(req, res){
@@ -131,26 +131,51 @@ function deletePerson(personID, client){
   });
 }
 
-function uploadFile(buffer, client){
+function uploadFileForIdentify(buffer, client){
+  var name = 'userUploadPhoto'
   var stream = bufferToStream(buffer);
-  blobService.createBlockBlobFromStream('faceimgs', 'testBlob', stream, buffer.length, function(error){
+  blobService.createBlockBlobFromStream('faceimgs', name, stream, buffer.length, function(error){
     if(error){
       client.write(error);
     };
   });
 }
 
-function addFace(personID, client){
+function uploadFileForAddFace(personID, buffer, client){
+  var options = {
+    method: 'GET',
+    url: 'https://southeastasia.api.cognitive.microsoft.com/face/v1.0/persongroups/facedb/persons/'+personID,
+    headers:
+     {'content-type': 'application/json',
+      'ocp-apim-subscription-key': subKey},
+    json: true
+  };
+
+  request(options, function(error, response, body){
+    if(error) console.log(error);
+    var name = body.name;
+    var stream = bufferToStream(buffer);
+    blobService.createBlockBlobFromStream('faceimgs', name, stream, buffer.length, function(error){
+      if(error){
+        client.write(error);
+      };
+    });
+    addFace(personID, name, client);
+  });
+}
+
+function addFace(personID, name, client){
+  var url = fileUrl + name;
   var options = {
     method: 'POST',
     url: 'https://southeastasia.api.cognitive.microsoft.com/face/v1.0/persongroups/facedb/persons/'+personID+'/persistedFaces',
     headers:
      {'content-type': 'application/json',
       'ocp-apim-subscription-key': subKey},
-    body: {url: fileUrl},
+    body: {url: fileUrl + name},
     json: true
   };
-
+  console.log(url);
   request(options, function(error, response, body){
     if(error) console.log(error);
     client.send(body);
@@ -180,7 +205,7 @@ function detectFace(client){
     headers:
      {'content-type': 'application/json',
       'ocp-apim-subscription-key': subKey},
-    body: {url: fileUrl},
+    body: {url: fileUrl + 'userUploadPhoto'},
     json: true
   };
 
@@ -210,7 +235,8 @@ function identify(faceid, client){
 
   request(options, function(error, response, body){
     if(error) console.log(error);
-    client.send(body);
+    var personID = body[0].candidates[0].personId;
+    queryPerson(personID, client, true);
   });
 }
 
@@ -228,5 +254,21 @@ function getCrimeInfo(postcode, client){
       client.send(docs);
       db.close();
     });
+  });
+}
+
+function queryPerson(personID, client){
+  var options = {
+    method: 'GET',
+    url: 'https://southeastasia.api.cognitive.microsoft.com/face/v1.0/persongroups/facedb/persons/'+personID,
+    headers:
+     {'content-type': 'application/json',
+      'ocp-apim-subscription-key': subKey},
+    json: true
+  };
+
+  request(options, function(error, response, body){
+    if(error) console.log(error);
+    client.send(body.name);
   });
 }
