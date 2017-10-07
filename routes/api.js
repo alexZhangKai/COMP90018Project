@@ -249,6 +249,9 @@ function getCrimeInfo(postcode, client){
     var collection = db.collection('only2017info');
     collection.find({
       Postcode:postcode
+    },{
+      "Suburb/Town Name": true,
+      "CSA Offence Subdivision": true
     }).toArray(function(err, docs){
       if(err) console.log(err);
       client.send(docs);
