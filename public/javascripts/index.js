@@ -27,7 +27,7 @@ $(function(){
       var newPersonData = $('#personData').val() || 'personData'
       var params = {
         personName: newPersonName,
-        userData: newPersonName
+        userData: newPersonData
       };
       // var url = window.location.hostname + '/api/createFaceGroup?' + $.param(params);
       var url = '/api/createPerson?' + $.param(params);
