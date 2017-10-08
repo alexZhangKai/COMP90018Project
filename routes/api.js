@@ -175,10 +175,9 @@ function addFace(personID, name, client){
     headers:
      {'content-type': 'application/json',
       'ocp-apim-subscription-key': subKey},
-    body: {url: fileUrl + name},
+    body: {url: url},
     json: true
   };
-  console.log(url);
   request(options, function(error, response, body){
     if(error) console.log(error);
     client.send(body);
@@ -237,9 +236,15 @@ function identify(faceid, client){
   };
 
   request(options, function(error, response, body){
-    if(error) console.log(error);
-    var personID = body[0].candidates[0].personId;
-    queryPerson(personID, client, true);
+    if(error) console.error(error);
+    console.log(body);
+    console.log(body[0].candidates);
+    if(body[0].candidates.length == 0) {
+      client.send("unrecognizedPerson")
+    } else {
+      var personID = body[0].candidates[0].personId;
+      queryPerson(personID, client);
+    }
   });
 }
 
@@ -276,6 +281,7 @@ function queryPerson(personID, client){
 
   request(options, function(error, response, body){
     if(error) console.log(error);
+    console.log(body);
     var result = body.name + "," + body.userData;
     client.send(result);
   });
