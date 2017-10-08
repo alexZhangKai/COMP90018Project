@@ -18,7 +18,7 @@ router.get('/createFaceGroup', function(req, res){
 });
 
 router.get('/createPerson', function(req, res){
-  createPerson(req.query.personName, res);
+  createPerson(req.query.personName, req.query.userData, res);
 });
 
 router.get('/listAllPerson', function(req, res){
@@ -82,14 +82,17 @@ function createFaceGroup(groupName, client){
   });
 }
 
-function createPerson(personName, client){
+function createPerson(personName, userData, client){
   var options = {
     method: 'POST',
     url: 'https://southeastasia.api.cognitive.microsoft.com/face/v1.0/persongroups/facedb/persons',
     headers:
      {'content-type': 'application/json',
       'ocp-apim-subscription-key': subKey},
-    body: {name: personName},
+    body: {
+      name: personName,
+      userData: userData
+    },
     json: true
   };
 
@@ -273,6 +276,7 @@ function queryPerson(personID, client){
 
   request(options, function(error, response, body){
     if(error) console.log(error);
-    client.send(body.name);
+    var result = body.name + "," + body.userData;
+    client.send(result);
   });
 }
