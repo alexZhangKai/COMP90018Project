@@ -251,7 +251,8 @@ function getCrimeInfo(postcode, client){
       Postcode:postcode
     },{
       "Suburb/Town Name": true,
-      "CSA Offence Division": true
+      "CSA Offence Division": true,
+      "Offence Count": true
     }).toArray(function(err, docs){
       if(err) console.log(err);
       client.send(docs);
